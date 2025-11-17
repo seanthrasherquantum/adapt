@@ -629,12 +629,30 @@ class Xiphos:
         return np.array(res.x)
 
     def gd_detailed_vqe(self, params, ansatz, seed):
+        self.diags = [None for i in self.v_pool]
+        self.unitaries = [None for i in self.v_pool]
+
+        np.random.seed(seed = seed)
+        for j in ansatz:
+            if self.diags[j] is None:
+                print("Diagonalizing operator...")
+                start = time.time()
+                G = self.pool[j].todense()
+                H = -1j * G
+                w, v = np.linalg.eigh(H)
+                self.diags[j] = 1j * w
+                v[abs(v) < 1e-16] = 0
+                v = scipy.sparse.csc_matrix(v)
+                self.unitaries[j] = v
+                stop = time.time()
+                print(f"Operator diagonalized in {stop-start} s")
+                print(f"done {j} out of {len(ansatz)}")
         energy = self.gd_t_ucc_E
         jac = self.gd_t_ucc_grad
 
         vqe_energies=[]
         def myvqe(xk):
-            energy_vqe=energy(xk,ansatz)
+            energy_vqe=float(energy(xk,ansatz))
             vqe_energies.append(energy_vqe)
 
 
