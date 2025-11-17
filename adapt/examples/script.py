@@ -36,7 +36,7 @@ def main():
         basis = "cc-pvdz"
     else:
         raise ValueError("Molecule not recognized. Choose from: h, lih, beh, n")
-    H, ref, N_qubits, N_e = build_system(geom, basis=basis, reference=args.ref)
+    H, ref, N_qubits, N_e = build_system(geom, basis=basis, reference=args.ref, active=active)
 
     s = sm.system_data(H, ref, N_e, N_qubits)
     jw_pool, v_pool = s.uccsd_pool(approach="vanilla")
