@@ -17,27 +17,16 @@ source $(conda info --base)/etc/profile.d/conda.sh
 
 # Activate your environment
 
-# ...existing code...
-
-# Activate your environment (use name or full path if present)
-ENV_PATH=/exports/eddie/scratch/s2434746/conda_envs/adapt
-if [ -d "$ENV_PATH" ]; then
-  conda activate "$ENV_PATH"
-else
-  echo "Warning: conda env not found at $ENV_PATH — activating 'base' instead"
-  conda activate base
-fi
+conda activate /exports/eddie/scratch/s2434746/conda_envs/quantum2
 
 # Make sure the AVQ source directory is visible to Python (optional but safe)
-export PYTHONPATH=/exports/eddie/scratch/s2434746/PhD/adapt:$PYTHONPATH
+export PYTHONPATH=/exports/eddie/scratch/s2434746/PhD/AVQproject:$PYTHONPATH
 
 # Reinstall in editable mode inside the job (optional)
-python -m pip install -e .
-pip install pyscf
-# ...existing code...
+pip install -e /exports/eddie/scratch/s2434746/PhD/AVQproject/AVQ
 
 echo "=== Starting main.py at $(date) ==="
 
 
 # Run the script with arguments
-python /exports/eddie/scratch/s2434746/PhD/adapt/adapt/examples/script.py "$@"
+python /exports/eddie/scratch/s2434746/PhD/AVQproje
