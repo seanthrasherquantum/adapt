@@ -9,12 +9,13 @@ import scipy
 import copy
 import time
 import math
-import git
+# import git
 
 import random
 from multiprocessing import Pool
 #Globals
 Eh = 627.5094740631
+
 
 class Xiphos:
     """Class representing an individual XIPHOS calculation"""
@@ -524,9 +525,9 @@ class Xiphos:
         print("\n---------------------------\n")
         print("\"Adapt.\" - Bear Grylls\n")
         print("\"ADAPT.\" - Harper \"Grimsley Bear\" Grimsley\n")
-        repo = git.Repo(search_parent_directories=True)
-        sha = repo.head.object.hexsha
-        print(f"Git revision:\ngithub.com/hrgrimsl/fixed_adapt/commit/{sha}")
+        # repo = git.Repo(search_parent_directories=True)
+        # sha = repo.head.object.hexsha
+        # print(f"Git revision:\ngithub.com/hrgrimsl/fixed_adapt/commit/{sha}")
         return error
 
     def gd_t_ucc_state(self, params, ansatz):
@@ -631,9 +632,16 @@ class Xiphos:
         energy = self.gd_t_ucc_E
         jac = self.gd_t_ucc_grad
 
+        vqe_energies=[]
+        def myvqe(xk):
+            energy_vqe=energy(xk,ansatz)
+            vqe_energies.append(energy_vqe)
+
+
+
         x0 = params
         E0 = energy(params, ansatz)
-        res = scipy.optimize.minimize(energy, params, jac = jac, method = "bfgs", args = (ansatz), options = {'gtol': 1e-8})
+        res = scipy.optimize.minimize(energy, params, jac = jac, method = "bfgs", args = (ansatz), options = {'gtol': 1e-8},callback=myvqe)
 
         EF = res.fun
 
@@ -666,7 +674,7 @@ class Xiphos:
             err = val - self.ed_syms[0][key]
             string += f"{key:<6}:      {val:20.16f}      {err:20.16f}\n"
         string += '\n\n'
-        return [res, string]
+        return [res, string], vqe_energies
 
     def gd_multi_vqe(self, params, ansatz, guesses = 0, hf = True, threads = 1, F = None, follow = 0, diags = None, unitaries = None):
         if diags is not None:
@@ -969,9 +977,9 @@ class Xiphos:
         print("\n---------------------------\n")
         print("\"Adapt.\" - Bear Grylls\n")
         print("\"ADAPT.\" - Harper \"Grimsley Bear\" Grimsley\n")
-        repo = git.Repo(search_parent_directories=True)
-        sha = repo.head.object.hexsha
-        print(f"Git revision:\ngithub.com/hrgrimsl/fixed_adapt/commit/{sha}")
+        # repo = git.Repo(search_parent_directories=True)
+        # sha = repo.head.object.hexsha
+        # print(f"Git revision:\ngithub.com/hrgrimsl/fixed_adapt/commit/{sha}")
         return error
 
     def graph(self, ansatz, ref):

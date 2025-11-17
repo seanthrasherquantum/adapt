@@ -6,11 +6,17 @@ from adapt.driver import *
 from adapt.pyscf_backend import *
 from adapt.of_translator import *
 
-def run_example():
+
+def run_example(separation):
     """Test ADAPT on H4."""
     if os.path.exists('test') == False:
         os.makedirs('test')
-    geom = 'H 0 0 0; H 0 0 1; H 0 0 2; H 0 0 3'
+    # geom = 'H 0 0 0; H 0 0 1; H 0 0 2; H 0 0 3'
+
+    # geom=f'Be 0 0 0; H 0 0 -{separation}; H 0 0 {separation}'
+
+    geom=f'Li 0 0 0; H 0 0 {separation}'
+
     basis = "sto-3g"
     reference = "rhf"
     
@@ -30,12 +36,16 @@ def run_example():
     #Build 'xiphos' object (essentially ADAPT class)
     xiphos = Xiphos(H, ref, "test", pool, v_pool, sym_ops = {"H": H, "S_z": Sz, "S^2": S2, "N": Nop})
     params = np.array([])
-    ansatz = []
+    ansatz = xiphos.
+    
     
     #Run ADAPT^1
-    error = xiphos.breadapt(params, ansatz, ref, Etol = 1e-8, guesses = 0, hf = False, n = 1, threads = 1)
+    # error = xiphos.breadapt(params, ansatz, ref, Etol = 1e-8, guesses = 0, hf = False, n = 1, threads = 1)
+    [res, string], vqe_energies= xiphos.gd_detailed_vqe(params, ansatz, seed=32)
+
 
 if __name__ == "__main__":
-   run_example()
 
+    from sys import argv
 
+    run_example(float(argv[1]))

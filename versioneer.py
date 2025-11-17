@@ -1,4 +1,3 @@
-
 # Version: 0.18
 
 """The Versioneer - like a rocketeer, but for versions.
@@ -281,6 +280,9 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
+# Compatibility: Python 3 uses RawConfigParser; provide SafeConfigParser alias if missing
+if not hasattr(configparser, "SafeConfigParser"):
+    configparser.SafeConfigParser = configparser.RawConfigParser
 import errno
 import json
 import os
