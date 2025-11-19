@@ -40,4 +40,4 @@ echo "=== Starting main.py at $(date) ==="
 
 
 # Run the script with arguments
-python /exports/eddie/scratch/s2434746/PhD/adapt/adapt/examples/script.py "$@"
+python /exports/eddie/scratch/s2434746/PhD/adapt/adapt/examples/script.py --mol h4 --steps "$1" --r "$2"

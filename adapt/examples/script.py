@@ -47,7 +47,8 @@ class Molecular:
         self.geom = geom
         self.basis = basis
         self.active = active
-        self.E_nuc, self.H_core, self.g, self.D, self.C, self.hf_energy, self.fci_energy= get_integrals(self.geom, self.basis, "rhf", chkfile="scr.chk", read=False, active=self.active)
+        self.r=bond_length
+        self.E_nuc, self.H_core, self.g, self.D, self.C, self.hf_energy, self.fci_energy= get_integrals(self.geom, self.basis, "rhf", chkfile=f"scr{self.r}.chk", read=False, active=self.active)
         self.N_e = int(np.trace(self.D))
         self.H, self.ref, self.N_qubits, self.S2, self.Sz, self.Nop = of_from_arrays(self.E_nuc, self.H_core, self.g, self.N_e) 
         self.F_dense=get_F(self.geom, self.basis,"rhf",sparse=True,qubits=self.N_qubits,)
@@ -80,9 +81,9 @@ class Xiphos_Builder:
     
 
 if __name__ == "__main__":
-    r=args.r
+    r=float(args.r)
     mol=args.mol
-    steps=args.steps
+    steps=int(args.steps)
     mol_instance=Molecular(mol, r)
 
     print(mol_instance.active)
@@ -133,4 +134,5 @@ if __name__ == "__main__":
     df['r']=r
     df['energy_error']=df['energy'] - mol_instance.fci_energy
     print(df)
-    df.to_csv(f'/home/sthrash/PhD/adapt/adapt/examples/aavqe_energies_{r}_{mol_instance.mol}.csv', index=False)
+ 
+    df.to_csv(f'aavqe_energies_{r}_{steps}.csv', index=False)
