@@ -15,7 +15,7 @@ def run_example(separation):
 
     # geom=f'Be 0 0 0; H 0 0 -{separation}; H 0 0 {separation}'
 
-    geom=f'Li 0 0 0; H 0 0 {separation}'
+    # geom=f'Li 0 0 0; H 0 0 {separation}'
 
     basis = "sto-3g"
     reference = "rhf"

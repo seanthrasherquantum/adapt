@@ -3,7 +3,7 @@ from pyscf import fci, gto, scf, mcscf
 from pyscf.lib import logger
 import numpy as np
 from opt_einsum import contract
-
+from openfermion.linalg import get_sparse_operator
 def get_integrals(geometry, basis, reference, charge = 0, spin = 0, read = False, chkfile = 'chk', feed_C = False, scf_grad = 1e-14, active = None):    
     """Function to get the pyscf integrals and stuff to feed to OpenFermion
 
@@ -70,6 +70,7 @@ def get_integrals(geometry, basis, reference, charge = 0, spin = 0, read = False
     Va = 0
     Vb = 0
     if reference != "uhf":
+
         Ca = Cb = mf.mo_coeff
         mo_a = np.zeros(len(mo_occ))
         mo_b = np.zeros(len(mo_occ))
@@ -148,16 +149,20 @@ def get_integrals(geometry, basis, reference, charge = 0, spin = 0, read = False
         cisolver = fci.FCI(mol, mf.mo_coeff)
         print("PYSCF FCI:")
         print(cisolver.kernel(verbose=logger.DEBUG)[0])
+        fci_energy=cisolver.kernel(verbose=logger.DEBUG)[0]
     else:
         mycas = mcscf.CASCI(mf, active[0], active[1])
+        # mo=mycas.sort_mo(np.array([1,2,3,4]))
         casci = mycas.kernel(verbose=logger.DEBUG)
         print("PYSCF CASCI:")
         print(casci[0])
-    return E_nuc, H_core, g, D, C, hf_energy
+
+        fci_energy=casci[0]
+    return E_nuc, H_core, g, D, C, hf_energy, fci_energy
 
 
 
-def get_F(geometry, basis, reference, charge = 0, spin = 0, feed_C = False):
+def get_F(geometry, basis, reference, charge = 0, spin = 0, feed_C = False,sparse=False,qubits=None):
     mol = gto.M(atom = geometry, basis = basis, spin = spin, charge = charge)
     mol.symmetry = False
     mol.max_memory = 8e3
@@ -256,6 +261,7 @@ def get_F(geometry, basis, reference, charge = 0, spin = 0, feed_C = False):
     F = np.kron(Fa, A) + np.kron(Fb, B)
     g -= contract('pqrs->pqsr', g)
     g *= -.25
+
     return F
 
 def freeze_core(E_nuc, H, I, D, N_c):

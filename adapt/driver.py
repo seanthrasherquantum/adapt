@@ -531,7 +531,24 @@ class Xiphos:
         return error
 
     def gd_t_ucc_state(self, params, ansatz):
+        self.diags = [None for i in self.v_pool]
+        self.unitaries = [None for i in self.v_pool]
 
+        np.random.seed(seed = 32)
+        for j in ansatz:
+            if self.diags[j] is None:
+                print("Diagonalizing operator...")
+                start = time.time()
+                G = self.pool[j].todense()
+                H = -1j * G
+                w, v = np.linalg.eigh(H)
+                self.diags[j] = 1j * w
+                v[abs(v) < 1e-16] = 0
+                v = scipy.sparse.csc_matrix(v)
+                self.unitaries[j] = v
+                stop = time.time()
+                print(f"Operator diagonalized in {stop-start} s")
+                print(f"done {j} out of {len(ansatz)}")
         state = copy.copy(self.ref).todense()
         for i in reversed(range(0, len(ansatz))):
             U = self.unitaries[ansatz[i]]
@@ -572,8 +589,12 @@ class Xiphos:
         return grad.real
        
     def gd_adiabatic_vqe(self, params, ansatz, F = None, steps = 100):
+       
+
+
         H0 = F + ((self.ref.T@self.H_vqe@self.ref)[0,0] - (self.ref.T@F@self.ref)[0,0])*scipy.sparse.identity(F.shape[0])
 
+        # H0 = F
 
         energy = self.gd_t_ucc_E
         jac = self.gd_t_ucc_grad
@@ -583,12 +604,17 @@ class Xiphos:
         corr = 0
         params = 0 * np.array(params)
         print("Adiabatic Optimization...")
-        for i in range(0, steps):
+
+        aavqe_energies=[]
+        for i in range(1, steps+1):
             corr += 1/steps
+
+            # print(f"H_vqe {self.H_vqe}  \n H0,self.H: {H0} {self.H}")
             self.H_vqe = H0 + corr*(self.H - H0)
 
-            res = scipy.optimize.minimize(energy, params, jac = jac, method = "bfgs", args = (ansatz), options = {'gtol': 1e-8})
-
+            # res = scipy.optimize.minimize(energy, params, jac = jac, method = "bfgs", args = (ansatz), options = {'gtol': 1e-8})
+            [res, string], vqe_energies =self.gd_detailed_vqe(params, ansatz, seed = 42)
+            aavqe_energies.append({'t': i/steps, 'vqe_energies': vqe_energies})
             params = np.array(res.x)
             state_1 = self.gd_t_ucc_state(params, ansatz)
             energy_1 = (state_1.T@self.H@state_1)[0,0]
@@ -626,7 +652,7 @@ class Xiphos:
         print(string)
 
 
-        return np.array(res.x)
+        return np.array(res.x), aavqe_energies
 
     def gd_detailed_vqe(self, params, ansatz, seed):
         self.diags = [None for i in self.v_pool]

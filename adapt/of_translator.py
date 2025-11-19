@@ -41,7 +41,7 @@ def of_from_arrays(_0body, _1body, I, N_e, unpaired = 0, n_qubits = None, occupi
         f_hamiltonian += of.ops.FermionOperator(term = i, coefficient = hamiltonian[i])
     if occupied is not None:
          of.transforms.freeze_orbitals(f_hamiltonian, occupied, unoccupied = unoccupied, prune = True)
-
+    
     hamiltonian = scipy.sparse.csr.csr_matrix(get_sparse_operator(f_hamiltonian, n_qubits = n_qubits).real)
 
     H = np.array(hamiltonian)

@@ -1,0 +1,23 @@
+
+Solution Analysis:
+
+Parameters: 3
+Initialization: 32
+Initial Energy:  -1.0661086493179357
+Final Energy:  -1.1011503302326178
+GNorm:   0.0000000000046706
+Fidelity:   0.9999999999999991
+Success: True
+Energy Evals: 6
+Gradient Evals: 5
+Initial Parameters:
+0.0,0.0,0.0,
+Solution Parameters:
+0.0,-0.17621885032170265,0.0,
+Operator/ Expectation Value/ Error:
+H     :       -1.1011503302326178        0.0000000000000013
+S_z   :        0.0000000000000000        0.0000000000000000
+S^2   :        0.0000000000000000       -0.0000000000000000
+N     :        1.9999999999999982       -0.0000000000000018
+
+
